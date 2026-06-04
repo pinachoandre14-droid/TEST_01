@@ -16,61 +16,144 @@
     --muted:#8a847b;
     --line:#ddd8cf;
     --line-strong:#c7c1b6;
-    --accent:#b15a37;        /* terracota arquitectónica */
+    --accent:#b15a37;
     --accent-soft:#f0e3da;
     --pad-x:104px;
     --pad-y:84px;
     font-family:'Archivo','Helvetica Neue',Arial,sans-serif;
   }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;background:#000;}
-  deck-stage:not(:defined){visibility:hidden;}
+  *{box-sizing:border-box;margin:0;padding:0;}
 
-  section{ background:var(--bg); color:var(--ink); }
-  .pad{ position:absolute; inset:0; padding:var(--pad-y) var(--pad-x); display:flex; flex-direction:column; }
+  /* ── Scroll container ── */
+  html{
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+    height: 100%;
+  }
+  body{
+    background:#000;
+    height: 100%;
+  }
 
-  /* ── chrome (top bar) ─────────────────────────── */
+  /* ── Each section = one full viewport ── */
+  section{
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: var(--bg);
+    color: var(--ink);
+    overflow: hidden;
+  }
+
+  .pad{
+    position: absolute;
+    inset: 0;
+    padding: var(--pad-y) var(--pad-x);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Scroll progress indicator ── */
+  #scroll-nav{
+    position: fixed;
+    right: 32px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+  }
+  .nav-dot{
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--line-strong);
+    cursor: pointer;
+    transition: background .3s, transform .3s;
+  }
+  .nav-dot.active{
+    background: var(--accent);
+    transform: scale(1.4);
+  }
+
+  /* ── Scroll hint (first slide) ── */
+  .scroll-hint{
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    animation: bounce 2s ease-in-out infinite;
+  }
+  .scroll-hint svg{ opacity: .5; }
+  @keyframes bounce{
+    0%,100%{ transform: translateX(-50%) translateY(0); }
+    50%{ transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ── Entrance animations ── */
+  .reveal{
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1);
+  }
+  .reveal.delay-1{ transition-delay: .1s; }
+  .reveal.delay-2{ transition-delay: .2s; }
+  .reveal.delay-3{ transition-delay: .35s; }
+  .reveal.delay-4{ transition-delay: .5s; }
+  .reveal.visible{
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ── Chrome ── */
   .bar{ display:flex; justify-content:space-between; align-items:flex-start; }
-  .bar::after{ content:""; }
   .mono{ font-family:'IBM Plex Mono',ui-monospace,monospace; }
   .tag{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:15px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:14px; }
   .tag .dot{ width:7px; height:7px; background:var(--accent); border-radius:50%; display:inline-block; }
   .secno{ color:var(--ink); }
   .secno b{ color:var(--accent); font-weight:500; }
   .rule{ height:1px; background:var(--line); margin-top:22px; }
-
   .body{ flex:1; display:flex; min-height:0; }
-
-  /* footer slug */
   .slug{ position:absolute; left:var(--pad-x); bottom:46px; font-family:'IBM Plex Mono',monospace; font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
 
   h1,h2,h3,p{ margin:0; }
   .display{ font-weight:300; letter-spacing:-.02em; line-height:.92; }
   .lede{ font-weight:300; color:var(--ink-2); line-height:1.45; }
 
-  /* ── editable affordance ──────────────────────── */
   [contenteditable]{ outline:none; }
   [contenteditable]:focus{ background:var(--accent-soft); box-shadow:0 0 0 2px var(--accent-soft); border-radius:2px; }
 
-  /* ── image / video slots ──────────────────────── */
+  /* ── Image / video slots ── */
   .figure{ display:flex; flex-direction:column; gap:12px; min-height:0; }
   .figure image-slot, .figure .slotwrap{ flex:1; min-height:0; width:100%; height:auto; display:block; border:1px solid var(--line-strong); }
   image-slot{ background:#efece6; }
   .cap{ font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--muted); display:flex; justify-content:space-between; }
   .cap b{ color:var(--ink-2); font-weight:500; }
 
-  /* ── slide 1 cover ────────────────────────────── */
+  /* ── Slide 1 · Cover ── */
   .cover .body{ flex-direction:column; justify-content:center; gap:40px; }
   .cover .kicker{ font-family:'IBM Plex Mono',monospace; font-size:17px; letter-spacing:.32em; text-transform:uppercase; color:var(--accent); }
-  .cover h1{ font-size:236px; }
-  .cover .sub{ font-size:34px; font-weight:300; color:var(--ink-2); max-width:1100px; line-height:1.25; margin-top:8px; }
+  .cover h1{ font-size:clamp(80px, 12vw, 236px); }
+  .cover .sub{ font-size:clamp(18px,2vw,34px); font-weight:300; color:var(--ink-2); max-width:1100px; line-height:1.25; margin-top:8px; }
   .meta{ position:absolute; left:var(--pad-x); right:var(--pad-x); bottom:var(--pad-y); display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); padding-top:24px; }
   .meta .k{ font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
   .meta .v{ font-size:25px; font-weight:400; color:var(--ink); }
 
-  /* ── two-column intro ─────────────────────────── */
+  /* ── Two-column intro ── */
   .twocol{ display:grid; grid-template-columns:0.85fr 1.15fr; gap:96px; width:100%; align-items:start; padding-top:40px; }
-  .twocol h2{ font-size:104px; }
+  .twocol h2{ font-size:clamp(48px,6vw,104px); }
   .twocol .lede{ font-size:27px; max-width:760px; }
   .obj{ list-style:none; padding:0; margin:44px 0 0; display:flex; flex-direction:column; gap:0; }
   .obj li{ display:flex; gap:28px; padding:22px 0; border-top:1px solid var(--line); align-items:baseline; }
@@ -79,7 +162,7 @@
   .obj .t{ font-size:23px; font-weight:400; color:var(--ink); line-height:1.35; }
   .obj .t span{ display:block; font-size:17px; color:var(--muted); font-weight:300; margin-top:5px; }
 
-  /* ── stats ───────────────────────────────────── */
+  /* ── Stats ── */
   .stats{ width:100%; display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(2,1fr); gap:0; padding-top:34px; }
   .stat{ padding:40px 40px 40px 0; border-top:1px solid var(--line); }
   .stat .k{ font-family:'IBM Plex Mono',monospace; font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
@@ -87,20 +170,20 @@
   .stat .v u{ text-decoration:none; font-size:32px; color:var(--accent); margin-left:8px; }
   .stat .v small{ font-size:40px; color:var(--ink-2); font-weight:300; }
 
-  /* ── galleries ───────────────────────────────── */
+  /* ── Galleries ── */
   .gal3{ width:100%; display:grid; grid-template-columns:1.4fr 1fr; grid-template-rows:1fr 1fr; gap:26px; padding-top:30px; }
   .gal3 .big{ grid-row:1 / span 2; }
   .bim{ width:100%; display:grid; grid-template-columns:1.5fr 1fr; gap:26px; padding-top:30px; }
   .bim .right{ display:grid; grid-template-rows:1fr 1fr; gap:26px; min-height:0; }
 
-  /* ── video ───────────────────────────────────── */
+  /* ── Video ── */
   .videowrap{ width:100%; display:grid; grid-template-columns:300px 1fr; gap:48px; padding-top:30px; align-items:stretch; }
   .videowrap .side h2{ font-size:46px; letter-spacing:-.01em; }
   .videowrap .side p{ font-size:19px; color:var(--ink-2); font-weight:300; line-height:1.5; margin-top:22px; }
   .videowrap .side .note{ font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:.1em; color:var(--muted); margin-top:auto; line-height:1.7; border-top:1px solid var(--line); padding-top:18px; }
   video-slot{ border:1px solid var(--line-strong); min-height:0; }
 
-  /* ── timeline ────────────────────────────────── */
+  /* ── Timeline ── */
   .time{ width:100%; padding-top:60px; }
   .track{ position:relative; display:grid; grid-template-columns:repeat(5,1fr); margin-top:30px; }
   .track::before{ content:""; position:absolute; top:7px; left:0; right:0; height:1px; background:var(--line-strong); }
@@ -111,237 +194,273 @@
   .ph .h{ font-size:25px; font-weight:400; margin-top:12px; line-height:1.2; }
   .ph .d{ font-size:16px; font-weight:300; color:var(--muted); margin-top:10px; line-height:1.45; }
 
-  /* ── team ────────────────────────────────────── */
+  /* ── Team ── */
   .team{ width:100%; padding-top:40px; }
   .teamgrid{ display:grid; grid-template-columns:repeat(2,1fr); gap:0 96px; }
   .member{ display:flex; justify-content:space-between; align-items:baseline; padding:26px 0; border-top:1px solid var(--line); }
-  .member:nth-last-child(-n+2){ } 
   .member .nm{ font-size:30px; font-weight:400; }
   .member .ro{ font-family:'IBM Plex Mono',monospace; font-size:14px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
 
-  /* big section heading helper */
-  .ghead{ font-size:104px; font-weight:300; letter-spacing:-.02em; line-height:.95; }
+  .ghead{ font-size:clamp(48px,6vw,104px); font-weight:300; letter-spacing:-.02em; line-height:.95; }
   .gsub{ font-size:21px; font-weight:300; color:var(--ink-2); margin-top:18px; max-width:680px; line-height:1.4; }
-
-  /* ── entrance animation ──────────────────────── */
-  @media (prefers-reduced-motion:no-preference){
-    [data-deck-active] .anim{ animation:rise .6s cubic-bezier(.2,.7,.2,1) both; }
-    [data-deck-active] .anim:nth-child(2){ animation-delay:.06s; }
-    [data-deck-active] .anim:nth-child(3){ animation-delay:.12s; }
-    /* transform-only: if the timeline is paused (backgrounded tab / capture)
-       content stays fully visible — never blank. */
-    @keyframes rise{ from{ transform:translateY(18px);} to{ transform:none;} }
-  }
 </style>
 </head>
 <body>
 
-<deck-stage width="1920" height="1080">
+<!-- ── Navigation dots ── -->
+<nav id="scroll-nav">
+  <div class="nav-dot active" data-index="0" title="Portada"></div>
+  <div class="nav-dot" data-index="1" title="Introducción"></div>
+  <div class="nav-dot" data-index="2" title="Datos"></div>
+  <div class="nav-dot" data-index="3" title="Renders"></div>
+  <div class="nav-dot" data-index="4" title="Modelo BIM"></div>
+  <div class="nav-dot" data-index="5" title="Recorrido"></div>
+  <div class="nav-dot" data-index="6" title="Fases"></div>
+  <div class="nav-dot" data-index="7" title="Equipo"></div>
+</nav>
 
-  <!-- ───────────────── 1 · PORTADA ───────────────── -->
-  <section data-label="Portada">
-    <div class="pad cover">
-      <div class="bar">
-        <div class="tag"><span class="dot"></span> Proyecto BIM · Suburbia Satélite</div>
-        <div class="tag" contenteditable="true">2026</div>
-      </div>
-      <div class="rule"></div>
-      <div class="body">
-        <div class="kicker anim" contenteditable="true">Modelado de información de construcción</div>
-        <h1 class="display anim" contenteditable="true">Jarvis 2</h1>
-        <p class="sub anim" contenteditable="true">Diseño y modelado BIM de una nueva sucursal de tienda departamental — del levantamiento arquitectónico a la coordinación digital del proyecto.</p>
-      </div>
-      <div class="meta">
-        <div><div class="k">Estudiante</div><div class="v" contenteditable="true">Nombre del alumno</div></div>
-        <div><div class="k">Asignatura</div><div class="v" contenteditable="true">Modelado BIM</div></div>
-        <div><div class="k">Institución</div><div class="v" contenteditable="true">Universidad / Instituto</div></div>
-        <div><div class="k">Fecha</div><div class="v" contenteditable="true">Junio 2026</div></div>
-      </div>
+<!-- ───────────────── 1 · PORTADA ───────────────── -->
+<section id="slide-0">
+  <div class="pad cover">
+    <div class="bar reveal">
+      <div class="tag"><span class="dot"></span> Proyecto BIM · Suburbia Satélite</div>
+      <div class="tag" contenteditable="true">2026</div>
     </div>
-  </section>
+    <div class="rule reveal delay-1"></div>
+    <div class="body">
+      <div class="kicker reveal delay-1" contenteditable="true">Modelado de información de construcción</div>
+      <h1 class="display reveal delay-2" contenteditable="true">Jarvis 2</h1>
+      <p class="sub reveal delay-3" contenteditable="true">Diseño y modelado BIM de una nueva sucursal de tienda departamental — del levantamiento arquitectónico a la coordinación digital del proyecto.</p>
+    </div>
+    <div class="meta reveal delay-4">
+      <div><div class="k">Estudiante</div><div class="v" contenteditable="true">Nombre del alumno</div></div>
+      <div><div class="k">Asignatura</div><div class="v" contenteditable="true">Modelado BIM</div></div>
+      <div><div class="k">Institución</div><div class="v" contenteditable="true">Universidad / Instituto</div></div>
+      <div><div class="k">Fecha</div><div class="v" contenteditable="true">Junio 2026</div></div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    Scroll
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10M4 10l4 4 4-4"/></svg>
+  </div>
+</section>
 
-  <!-- ───────────────── 2 · INTRODUCCIÓN ───────────────── -->
-  <section data-label="Introducción">
-    <div class="pad">
-      <div class="bar">
-        <div class="tag secno"><span class="dot"></span> <span><b>01</b> &nbsp;/&nbsp; Introducción</span></div>
-        <div class="tag">Suburbia · BIM</div>
-      </div>
-      <div class="rule"></div>
-      <div class="body">
-        <div class="twocol">
-          <div>
-            <h2 class="display anim" contenteditable="true">El proyecto</h2>
-          </div>
-          <div>
-            <p class="lede anim" contenteditable="true">Este trabajo presenta el modelado BIM de una nueva tienda departamental Suburbia, desarrollado como un modelo digital integral que reúne la geometría arquitectónica, la información de sus elementos y la coordinación entre disciplinas dentro de un mismo entorno.</p>
-            <ul class="obj anim">
-              <li><span class="n">01</span><span class="t">Modelar el inmueble en 3D paramétrico<span>Geometría, muros, losas, fachadas y mobiliario comercial con información asociada.</span></span></li>
-              <li><span class="n">02</span><span class="t">Coordinar disciplinas y detectar interferencias<span>Revisión de conflictos (clash detection) entre arquitectura, estructura e instalaciones.</span></span></li>
-              <li><span class="n">03</span><span class="t">Comunicar el proyecto con renders y recorridos<span>Generación de imágenes, planos y un recorrido virtual del modelo.</span></span></li>
-            </ul>
-          </div>
+<!-- ───────────────── 2 · INTRODUCCIÓN ───────────────── -->
+<section id="slide-1">
+  <div class="pad">
+    <div class="bar reveal">
+      <div class="tag secno"><span class="dot"></span> <span><b>01</b> &nbsp;/&nbsp; Introducción</span></div>
+      <div class="tag">Suburbia · BIM</div>
+    </div>
+    <div class="rule reveal delay-1"></div>
+    <div class="body">
+      <div class="twocol">
+        <div>
+          <h2 class="display reveal delay-1" contenteditable="true">El proyecto</h2>
+        </div>
+        <div>
+          <p class="lede reveal delay-2" contenteditable="true">Este trabajo presenta el modelado BIM de una nueva tienda departamental Suburbia, desarrollado como un modelo digital integral que reúne la geometría arquitectónica, la información de sus elementos y la coordinación entre disciplinas dentro de un mismo entorno.</p>
+          <ul class="obj reveal delay-3">
+            <li><span class="n">01</span><span class="t">Modelar el inmueble en 3D paramétrico<span>Geometría, muros, losas, fachadas y mobiliario comercial con información asociada.</span></span></li>
+            <li><span class="n">02</span><span class="t">Coordinar disciplinas y detectar interferencias<span>Revisión de conflictos (clash detection) entre arquitectura, estructura e instalaciones.</span></span></li>
+            <li><span class="n">03</span><span class="t">Comunicar el proyecto con renders y recorridos<span>Generación de imágenes, planos y un recorrido virtual del modelo.</span></span></li>
+          </ul>
         </div>
       </div>
-      <div class="slug">Fig. 01 — Alcance del proyecto</div>
     </div>
-  </section>
+    <div class="slug">Fig. 01 — Alcance del proyecto</div>
+  </div>
+</section>
 
-  <!-- ───────────────── 3 · DATOS ───────────────── -->
-  <section data-label="Datos">
-    <div class="pad">
-      <div class="bar">
-        <div class="tag secno"><span class="dot"></span> <span><b>02</b> &nbsp;/&nbsp; Datos del proyecto</span></div>
-        <div class="tag">Suburbia · BIM</div>
+<!-- ───────────────── 3 · DATOS ───────────────── -->
+<section id="slide-2">
+  <div class="pad">
+    <div class="bar reveal">
+      <div class="tag secno"><span class="dot"></span> <span><b>02</b> &nbsp;/&nbsp; Datos del proyecto</span></div>
+      <div class="tag">Suburbia · BIM</div>
+    </div>
+    <div class="rule reveal delay-1"></div>
+    <div class="body">
+      <div class="stats">
+        <div class="stat reveal delay-1"><div class="k">Superficie construida</div><div class="v" contenteditable="true">4 250 <u>m²</u></div></div>
+        <div class="stat reveal delay-2"><div class="k">Niveles</div><div class="v" contenteditable="true">3 <small>plantas</small></div></div>
+        <div class="stat reveal delay-3"><div class="k">Ubicación</div><div class="v" style="font-size:46px;" contenteditable="true">Ciudad de México</div></div>
+        <div class="stat reveal delay-1"><div class="k">Software BIM</div><div class="v" style="font-size:54px;" contenteditable="true">Autodesk Revit</div></div>
+        <div class="stat reveal delay-2"><div class="k">Nivel de desarrollo</div><div class="v" contenteditable="true">LOD <u>300</u></div></div>
+        <div class="stat reveal delay-3"><div class="k">Costo estimado</div><div class="v" contenteditable="true"><small>$</small>72 <small>MDP</small></div></div>
       </div>
-      <div class="rule"></div>
-      <div class="body">
-        <div class="stats">
-          <div class="stat anim"><div class="k">Superficie construida</div><div class="v" contenteditable="true">4 250 <u>m²</u></div></div>
-          <div class="stat anim"><div class="k">Niveles</div><div class="v" contenteditable="true">3 <small>plantas</small></div></div>
-          <div class="stat anim"><div class="k">Ubicación</div><div class="v" style="font-size:46px;" contenteditable="true">Ciudad de México</div></div>
-          <div class="stat anim"><div class="k">Software BIM</div><div class="v" style="font-size:54px;" contenteditable="true">Autodesk Revit</div></div>
-          <div class="stat anim"><div class="k">Nivel de desarrollo</div><div class="v" contenteditable="true">LOD <u>300</u></div></div>
-          <div class="stat anim"><div class="k">Costo estimado</div><div class="v" contenteditable="true"><small>$</small>72 <small>MDP</small></div></div>
+    </div>
+    <div class="slug">Fig. 02 — Ficha técnica</div>
+  </div>
+</section>
+
+<!-- ───────────────── 4 · RENDERS ───────────────── -->
+<section id="slide-3">
+  <div class="pad">
+    <div class="bar reveal">
+      <div class="tag secno"><span class="dot"></span> <span><b>03</b> &nbsp;/&nbsp; Galería de renders</span></div>
+      <div class="tag">Suburbia · BIM</div>
+    </div>
+    <div class="rule reveal delay-1"></div>
+    <div class="body">
+      <div class="gal3">
+        <div class="figure big reveal delay-1">
+          <image-slot id="render-fachada" shape="rect" fit="cover" placeholder="Arrastra el render de la fachada"></image-slot>
+          <div class="cap"><b>Fachada principal</b><span>render · exterior</span></div>
+        </div>
+        <div class="figure reveal delay-2">
+          <image-slot id="render-interior" shape="rect" fit="cover" placeholder="Arrastra una imagen"></image-slot>
+          <div class="cap"><b>Interior — planta baja</b><span>render</span></div>
+        </div>
+        <div class="figure reveal delay-3">
+          <image-slot id="render-acceso" shape="rect" fit="cover" placeholder="Arrastra una imagen"></image-slot>
+          <div class="cap"><b>Acceso / vestíbulo</b><span>render</span></div>
         </div>
       </div>
-      <div class="slug">Fig. 02 — Ficha técnica</div>
     </div>
-  </section>
+    <div class="slug">Fig. 03 — Visualización arquitectónica</div>
+  </div>
+</section>
 
-  <!-- ───────────────── 4 · RENDERS ───────────────── -->
-  <section data-label="Renders">
-    <div class="pad">
-      <div class="bar">
-        <div class="tag secno"><span class="dot"></span> <span><b>03</b> &nbsp;/&nbsp; Galería de renders</span></div>
-        <div class="tag">Suburbia · BIM</div>
-      </div>
-      <div class="rule"></div>
-      <div class="body">
-        <div class="gal3">
-          <div class="figure big">
-            <image-slot id="render-fachada" shape="rect" fit="cover" placeholder="Arrastra el render de la fachada"></image-slot>
-            <div class="cap"><b>Fachada principal</b><span>render · exterior</span></div>
+<!-- ───────────────── 5 · MODELO BIM ───────────────── -->
+<section id="slide-4">
+  <div class="pad">
+    <div class="bar reveal">
+      <div class="tag secno"><span class="dot"></span> <span><b>04</b> &nbsp;/&nbsp; Modelo BIM &amp; planos</span></div>
+      <div class="tag">Suburbia · BIM</div>
+    </div>
+    <div class="rule reveal delay-1"></div>
+    <div class="body">
+      <div class="bim">
+        <div class="figure reveal delay-1">
+          <image-slot id="bim-modelo" shape="rect" fit="cover" placeholder="Arrastra una captura del modelo 3D (Revit / Navisworks)"></image-slot>
+          <div class="cap"><b>Modelo federado 3D</b><span>vista isométrica</span></div>
+        </div>
+        <div class="right reveal delay-2">
+          <div class="figure">
+            <image-slot id="bim-planta" shape="rect" fit="contain" placeholder="Arrastra la planta"></image-slot>
+            <div class="cap"><b>Planta arquitectónica</b><span>N+0.00</span></div>
           </div>
           <div class="figure">
-            <image-slot id="render-interior" shape="rect" fit="cover" placeholder="Arrastra una imagen"></image-slot>
-            <div class="cap"><b>Interior — planta baja</b><span>render</span></div>
-          </div>
-          <div class="figure">
-            <image-slot id="render-acceso" shape="rect" fit="cover" placeholder="Arrastra una imagen"></image-slot>
-            <div class="cap"><b>Acceso / vestíbulo</b><span>render</span></div>
+            <image-slot id="bim-corte" shape="rect" fit="contain" placeholder="Arrastra el corte"></image-slot>
+            <div class="cap"><b>Corte transversal</b><span>A–A'</span></div>
           </div>
         </div>
       </div>
-      <div class="slug">Fig. 03 — Visualización arquitectónica</div>
     </div>
-  </section>
+    <div class="slug">Fig. 04 — Documentación digital</div>
+  </div>
+</section>
 
-  <!-- ───────────────── 5 · MODELO BIM / PLANOS ───────────────── -->
-  <section data-label="Modelo BIM">
-    <div class="pad">
-      <div class="bar">
-        <div class="tag secno"><span class="dot"></span> <span><b>04</b> &nbsp;/&nbsp; Modelo BIM &amp; planos</span></div>
-        <div class="tag">Suburbia · BIM</div>
+<!-- ───────────────── 6 · VIDEO ───────────────── -->
+<section id="slide-5">
+  <div class="pad">
+    <div class="bar reveal">
+      <div class="tag secno"><span class="dot"></span> <span><b>05</b> &nbsp;/&nbsp; Recorrido virtual</span></div>
+      <div class="tag">Suburbia · BIM</div>
+    </div>
+    <div class="rule reveal delay-1"></div>
+    <div class="body">
+      <div class="videowrap">
+        <div class="side reveal delay-1" style="display:flex;flex-direction:column;">
+          <h2 class="display" contenteditable="true">Walkthrough</h2>
+          <p contenteditable="true">Recorrido animado generado desde el modelo BIM, mostrando la circulación, los niveles y las áreas comerciales de la tienda.</p>
+          <div class="note">Arrastra tu archivo<br>de video sobre el<br>panel ▸ o haz clic<br>para seleccionarlo.</div>
+        </div>
+        <video-slot id="video-recorrido" class="reveal delay-2" accent="#b15a37" label="Arrastra el recorrido BIM · .mp4 / .webm"></video-slot>
       </div>
-      <div class="rule"></div>
-      <div class="body">
-        <div class="bim">
-          <div class="figure">
-            <image-slot id="bim-modelo" shape="rect" fit="cover" placeholder="Arrastra una captura del modelo 3D (Revit / Navisworks)"></image-slot>
-            <div class="cap"><b>Modelo federado 3D</b><span>vista isométrica</span></div>
-          </div>
-          <div class="right">
-            <div class="figure">
-              <image-slot id="bim-planta" shape="rect" fit="contain" placeholder="Arrastra la planta"></image-slot>
-              <div class="cap"><b>Planta arquitectónica</b><span>N+0.00</span></div>
-            </div>
-            <div class="figure">
-              <image-slot id="bim-corte" shape="rect" fit="contain" placeholder="Arrastra el corte"></image-slot>
-              <div class="cap"><b>Corte transversal</b><span>A–A'</span></div>
-            </div>
-          </div>
+    </div>
+    <div class="slug">Fig. 05 — Recorrido del modelo</div>
+  </div>
+</section>
+
+<!-- ───────────────── 7 · FASES ───────────────── -->
+<section id="slide-6">
+  <div class="pad">
+    <div class="bar reveal">
+      <div class="tag secno"><span class="dot"></span> <span><b>06</b> &nbsp;/&nbsp; Línea de tiempo · fases</span></div>
+      <div class="tag">Suburbia · BIM</div>
+    </div>
+    <div class="rule reveal delay-1"></div>
+    <div class="body">
+      <div class="time">
+        <h2 class="ghead reveal delay-1" contenteditable="true">Proceso de trabajo</h2>
+        <div class="track reveal delay-2">
+          <div class="ph active"><div class="mark"></div><div class="wk">Sem. 1–2</div><div class="h" contenteditable="true">Levantamiento</div><div class="d" contenteditable="true">Toma de datos, referencias y definición de niveles.</div></div>
+          <div class="ph"><div class="mark"></div><div class="wk">Sem. 3–5</div><div class="h" contenteditable="true">Modelado arq.</div><div class="d" contenteditable="true">Muros, losas, fachadas y mobiliario comercial.</div></div>
+          <div class="ph"><div class="mark"></div><div class="wk">Sem. 6–7</div><div class="h" contenteditable="true">Estructura e instalaciones</div><div class="d" contenteditable="true">Modelos MEP y estructural por disciplina.</div></div>
+          <div class="ph"><div class="mark"></div><div class="wk">Sem. 8</div><div class="h" contenteditable="true">Coordinación</div><div class="d" contenteditable="true">Modelo federado y detección de interferencias.</div></div>
+          <div class="ph"><div class="mark"></div><div class="wk">Sem. 9–10</div><div class="h" contenteditable="true">Documentación</div><div class="d" contenteditable="true">Planos, renders y recorrido virtual final.</div></div>
         </div>
       </div>
-      <div class="slug">Fig. 04 — Documentación digital</div>
     </div>
-  </section>
+    <div class="slug">Fig. 06 — Cronograma</div>
+  </div>
+</section>
 
-  <!-- ───────────────── 6 · VIDEO RECORRIDO ───────────────── -->
-  <section data-label="Recorrido">
-    <div class="pad">
-      <div class="bar">
-        <div class="tag secno"><span class="dot"></span> <span><b>05</b> &nbsp;/&nbsp; Recorrido virtual</span></div>
-        <div class="tag">Suburbia · BIM</div>
-      </div>
-      <div class="rule"></div>
-      <div class="body">
-        <div class="videowrap">
-          <div class="side" style="display:flex;flex-direction:column;">
-            <h2 class="display" contenteditable="true">Walkthrough</h2>
-            <p contenteditable="true">Recorrido animado generado desde el modelo BIM, mostrando la circulación, los niveles y las áreas comerciales de la tienda.</p>
-            <div class="note">Arrastra tu archivo<br>de video sobre el<br>panel ▸ o haz clic<br>para seleccionarlo.</div>
-          </div>
-          <video-slot id="video-recorrido" accent="#b15a37" label="Arrastra el recorrido BIM · .mp4 / .webm"></video-slot>
+<!-- ───────────────── 8 · EQUIPO ───────────────── -->
+<section id="slide-7">
+  <div class="pad">
+    <div class="bar reveal">
+      <div class="tag secno"><span class="dot"></span> <span><b>07</b> &nbsp;/&nbsp; Equipo &amp; créditos</span></div>
+      <div class="tag">Suburbia · BIM</div>
+    </div>
+    <div class="rule reveal delay-1"></div>
+    <div class="body">
+      <div class="team">
+        <h2 class="ghead reveal delay-1" contenteditable="true">Créditos</h2>
+        <div class="teamgrid reveal delay-2" style="margin-top:44px;">
+          <div class="member"><span class="nm" contenteditable="true">Nombre del alumno</span><span class="ro" contenteditable="true">Modelado BIM</span></div>
+          <div class="member"><span class="nm" contenteditable="true">Nombre del alumno</span><span class="ro" contenteditable="true">Renders</span></div>
+          <div class="member"><span class="nm" contenteditable="true">Nombre del alumno</span><span class="ro" contenteditable="true">Documentación</span></div>
+          <div class="member"><span class="nm" contenteditable="true">Nombre del alumno</span><span class="ro" contenteditable="true">Coordinación</span></div>
+          <div class="member"><span class="nm" contenteditable="true">Nombre del profesor</span><span class="ro" contenteditable="true">Asesor / docente</span></div>
+          <div class="member"><span class="nm" contenteditable="true">Institución</span><span class="ro" contenteditable="true">2026</span></div>
         </div>
       </div>
-      <div class="slug">Fig. 05 — Recorrido del modelo</div>
     </div>
-  </section>
-
-  <!-- ───────────────── 7 · FASES ───────────────── -->
-  <section data-label="Fases">
-    <div class="pad">
-      <div class="bar">
-        <div class="tag secno"><span class="dot"></span> <span><b>06</b> &nbsp;/&nbsp; Línea de tiempo · fases</span></div>
-        <div class="tag">Suburbia · BIM</div>
-      </div>
-      <div class="rule"></div>
-      <div class="body">
-        <div class="time">
-          <h2 class="ghead anim" contenteditable="true">Proceso de trabajo</h2>
-          <div class="track anim">
-            <div class="ph active"><div class="mark"></div><div class="wk">Sem. 1–2</div><div class="h" contenteditable="true">Levantamiento</div><div class="d" contenteditable="true">Toma de datos, referencias y definición de niveles.</div></div>
-            <div class="ph"><div class="mark"></div><div class="wk">Sem. 3–5</div><div class="h" contenteditable="true">Modelado arq.</div><div class="d" contenteditable="true">Muros, losas, fachadas y mobiliario comercial.</div></div>
-            <div class="ph"><div class="mark"></div><div class="wk">Sem. 6–7</div><div class="h" contenteditable="true">Estructura e instalaciones</div><div class="d" contenteditable="true">Modelos MEP y estructural por disciplina.</div></div>
-            <div class="ph"><div class="mark"></div><div class="wk">Sem. 8</div><div class="h" contenteditable="true">Coordinación</div><div class="d" contenteditable="true">Modelo federado y detección de interferencias.</div></div>
-            <div class="ph"><div class="mark"></div><div class="wk">Sem. 9–10</div><div class="h" contenteditable="true">Documentación</div><div class="d" contenteditable="true">Planos, renders y recorrido virtual final.</div></div>
-          </div>
-        </div>
-      </div>
-      <div class="slug">Fig. 06 — Cronograma</div>
-    </div>
-  </section>
-
-  <!-- ───────────────── 8 · EQUIPO ───────────────── -->
-  <section data-label="Equipo">
-    <div class="pad">
-      <div class="bar">
-        <div class="tag secno"><span class="dot"></span> <span><b>07</b> &nbsp;/&nbsp; Equipo &amp; créditos</span></div>
-        <div class="tag">Suburbia · BIM</div>
-      </div>
-      <div class="rule"></div>
-      <div class="body">
-        <div class="team">
-          <h2 class="ghead anim" contenteditable="true">Créditos</h2>
-          <div class="teamgrid anim" style="margin-top:44px;">
-            <div class="member"><span class="nm" contenteditable="true">Nombre del alumno</span><span class="ro" contenteditable="true">Modelado BIM</span></div>
-            <div class="member"><span class="nm" contenteditable="true">Nombre del alumno</span><span class="ro" contenteditable="true">Renders</span></div>
-            <div class="member"><span class="nm" contenteditable="true">Nombre del alumno</span><span class="ro" contenteditable="true">Documentación</span></div>
-            <div class="member"><span class="nm" contenteditable="true">Nombre del alumno</span><span class="ro" contenteditable="true">Coordinación</span></div>
-            <div class="member"><span class="nm" contenteditable="true">Nombre del profesor</span><span class="ro" contenteditable="true">Asesor / docente</span></div>
-            <div class="member"><span class="nm" contenteditable="true">Institución</span><span class="ro" contenteditable="true">2026</span></div>
-          </div>
-        </div>
-      </div>
-      <div class="slug">Gracias</div>
-    </div>
-  </section>
-
-</deck-stage>
+    <div class="slug">Gracias</div>
+  </div>
+</section>
 
 <script src="image-slot.js"></script>
 <script src="video-slot.js"></script>
-<script src="deck-stage.js"></script>
+<script>
+  // ── Scroll-triggered reveal ──
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      } else {
+        // Reset when scrolled out so re-entering re-animates
+        e.target.classList.remove('visible');
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el => revealObserver.observe(el));
+
+  // ── Nav dots ──
+  const sections = document.querySelectorAll('section');
+  const dots = document.querySelectorAll('.nav-dot');
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const i = parseInt(dot.dataset.index);
+      sections[i].scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && e.intersectionRatio >= 0.5) {
+        const i = Array.from(sections).indexOf(e.target);
+        dots.forEach(d => d.classList.remove('active'));
+        if (dots[i]) dots[i].classList.add('active');
+      }
+    });
+  }, { threshold: 0.5 });
+  sections.forEach(s => sectionObserver.observe(s));
+</script>
 </body>
 </html>
